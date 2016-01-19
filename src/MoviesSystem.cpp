@@ -38,7 +38,7 @@ MoviesSystem::~MoviesSystem() {
     return os << ms.inUse << ms.instance<<ms.isConstruct << ms.lock <<
     		ms.movies <<ms.professionals<<ms.server<<ms.types;
 }*/
-
+/*
 void MoviesSystem::save(MoviesSystem* ms){
 	//fstream f;
 	//f.open("archive.xml", ios::in | ios::out);
@@ -55,6 +55,7 @@ void MoviesSystem::load(MoviesSystem* ms){
 	boost::archive::xml_iarchive ia(file);
 	ia >> BOOST_SERIALIZATION_NVP(*ms);
 }
+*/
 /*******************************************************************************
  * function name : MoviesSystem											       *
  * input : nothing.														       *
@@ -147,7 +148,7 @@ int MoviesSystem::getCommand(int sock) {
 	vector<string> dat = this->split(data," ");
 
 	int key = atoi(dat.at(0).c_str());
-	string result;
+	string result = "~~-/START/-~~\n";
 	switch (key) {
 	case 1: {
 		string id, name, image, summary = "";
@@ -166,7 +167,7 @@ int MoviesSystem::getCommand(int sock) {
 				summary += " ";
 			}
 		}
-		result = this->setNewMovie(id, name, length, year, rank, image, summary);
+		result += this->setNewMovie(id, name, length, year, rank, image, summary);
 	}
 		break;
 	case 2: {
@@ -184,7 +185,7 @@ int MoviesSystem::getCommand(int sock) {
 				name += " ";
 			}
 		}
-		result = this->setNewProfessional(professionalType, id, age, specificDesc,
+		result += this->setNewProfessional(professionalType, id, age, specificDesc,
 				gender, name);
 	}
 		break;
@@ -193,14 +194,14 @@ int MoviesSystem::getCommand(int sock) {
 		int professionalId;
 		movieId = dat.at(1);
 		professionalId = atoi(dat.at(2).c_str());
-		result = this->addProfessionalToMovie(professionalId, movieId);
+		result += this->addProfessionalToMovie(professionalId, movieId);
 	}
 		break;
 	case 4: {
 		string movieId, typeStr;
 		movieId = dat.at(1);
 		typeStr = dat.at(2);
-		result = this->addTypeToMovie(movieId, typeStr);
+		result += this->addTypeToMovie(movieId, typeStr);
 	}
 		break;
 	case 5: {
@@ -208,43 +209,43 @@ int MoviesSystem::getCommand(int sock) {
 		int sortingType;
 		movieId = dat.at(1);
 		sortingType = atoi(dat.at(2).c_str());
-		result = this->setSortingTypeMovie(movieId, sortingType);
+		result += this->setSortingTypeMovie(movieId, sortingType);
 	}
 		break;
 	case 6: {
 		string movieId;
 		movieId = dat.at(1);
-		result = this->printAllProfessionalsOfMovie(movieId);
+		result += this->printAllProfessionalsOfMovie(movieId);
 	}
 		break;
 	case 7: {
 		string movieId;
 		movieId = dat.at(1);
-		result = this->printAllMovieDetails(movieId);
+		result += this->printAllMovieDetails(movieId);
 	}
 		break;
 	case 8: {
 		string line = dat.at(1);
 		vector<string> moviesId = this->split(line, ",");
-		result = this->mergeMovies(moviesId);
+		result += this->mergeMovies(moviesId);
 	}
 		break;
 	case 9: {
 		int professionalId;
 		professionalId = atoi(dat.at(1).c_str());
-		result = this->printAllMoviesOfProfessional(professionalId);
+		result += this->printAllMoviesOfProfessional(professionalId);
 	}
 		break;
 	case 10: {
 		string movieId;
 		movieId = dat.at(1);
-		result = this->deleteMovie(movieId);
+		result += this->deleteMovie(movieId);
 	}
 		break;
 	case 11: {
 		int professionalId;
 		professionalId = atoi(dat.at(1).c_str());
-		result = this->deleteProfessional(professionalId);
+		result += this->deleteProfessional(professionalId);
 	}
 		break;
 	case 12: {
@@ -252,29 +253,32 @@ int MoviesSystem::getCommand(int sock) {
 		int professionalId;
 		movieId = dat.at(1);
 		professionalId = atoi(dat.at(2).c_str());
-		result = this->removeProfessionalFromMovie(professionalId, movieId);
+		result += this->removeProfessionalFromMovie(professionalId, movieId);
 	}
 		break;
 	case 13: {
-		result = this->printAllMovies();
+		result += this->printAllMovies();
 	}
 		break;
 	case 14: {
-		result = this->printAllProfessionals();
+		result += this->printAllProfessionals();
 	}
 		break;
 	case 15: {
 		string typeStr;
 		typeStr = dat.at(1);
-		result = this->printAllMoviesOfType(typeStr);
+		result += this->printAllMoviesOfType(typeStr);
 	}
 		break;
 	default:
-		this->save(this->getInstance());
-		this->server->sendData("-1", sock);
+		//this->save(this->getInstance());
+		result += "-1";
+		result += "~~-/END/-~~\n";
+		this->server->sendData(result, sock);
 		return 0;
 		break;
 	}
+	result += "~~-/END/-~~\n";
 	this->server->sendData(result, sock);
 	return 1;
 }
@@ -435,7 +439,7 @@ string MoviesSystem::printAllProfessionalsOfMovie(string movieId) {
 	if (movie != NULL) {
 		for (vector<Professional*>::iterator it = movie->getStaff().begin();
 				it != movie->getStaff().end(); ++it) {
-			result += "~~-/SEPARATOR/-~~";
+			result += "~~-/SEPARATOR/-~~\n";
 			result += (*it)->toString();		}
 	} else {
 		result += "Failure\n";
@@ -713,7 +717,7 @@ string MoviesSystem::printAllMovies() {
 				result += (*it)->toString();
 				isFirst = false;
 			} else {
-				result += "~~-/SEPARATOR/-~~";
+				result += "~~-/SEPARATOR/-~~\n";
 				result += (*it)->toString();
 			}
 		}
@@ -741,9 +745,10 @@ string MoviesSystem::printAllProfessionals() {
 				result += (*it)->toString();
 				isFirst = false;
 			} else {
-				result += "~~-/SEPARATOR/-~~";
+				result += "~~-/SEPARATOR/-~~\n";
 				result += (*it)->toString();
-			}		}
+			}
+		}
 	}
 	string resultToSend = result.c_str();
 	return resultToSend;

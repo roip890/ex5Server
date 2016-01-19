@@ -1,2 +1,2 @@
 all:
-	g++ *.cc *.cpp -lm -ansi -pedantic -lpthread -o server.out
+	g++ *.cc *.cpp -lm -ansi -pedantic -lboost_serialization -lpthread -o server.out

@@ -21,8 +21,8 @@
 #include "Server.h"
 #include <fstream>
 // include headers that implement a archive in simple text format
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
+//#include <boost/archive/xml_oarchive.hpp>
+//#include <boost/archive/xml_iarchive.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/vector.hpp>
 using namespace std;
@@ -95,8 +95,8 @@ private:
 	 *******************************************************************************/
 	MoviesSystem();
 public:
-	void save(MoviesSystem* ms);
-	void load(MoviesSystem* ms);
+	//void save(MoviesSystem* ms);
+	//void load(MoviesSystem* ms);
 	static MoviesSystem* getInstance();
 	bool occupy();
 	void setServer(Server* serv);
